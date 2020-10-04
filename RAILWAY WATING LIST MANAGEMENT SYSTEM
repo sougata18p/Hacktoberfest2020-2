@@ -1,0 +1,511 @@
+/********************
+				*                                                           *
+				*          RAILWAY WATING LIST MANAGEMENT SYSTEM            *
+				*                                                           *
+				*********************/
+#include <bits/stdc++.h>
+#define n1 2
+#define m1 1
+#define n2 1
+#define m2 1
+using namespace std;
+static int p = 0;
+class a
+{
+	string train_no, pilot, arrival, depart, from, to, confirm_seat[n1] , other_seat[m1];
+	int cvs , rac_vs , wls ,oqs ;              //confirm vacant seat  , rac vacant seat
+	priority_queue<pair<int , string> > wl;
+	priority_queue<pair<int , pair<string , string> > > rac;
+	string name1;
+        public:
+        void install();
+        void allotment();
+        void empty();
+        void show();
+        void confirm_position(int);
+	void other_position(int);
+	void cancel_ticket();
+	void final_allotment();
+}
+train[2];
+void vline(char ch)
+{
+  for (int i=80;i>0;i--)
+  cout<<ch;
+}
+void a::install()
+{
+  cout<<"\nEnter Train no.\t\t:\t ";
+  cin>>train[p].train_no;
+  cout<<"\nEnter Pilot's name \t:\t ";
+  cin>>train[p].pilot;
+  cout<<"\nArrival time \t\t:\t ";
+  cin>>train[p].arrival;
+  cout<<"\nDeparture  \t\t:\t ";
+  cin>>train[p].depart;
+  cout<<"\nFrom\t\t\t:\t ";
+  cin>>train[p].from;
+  cout<<"\nTo\t\t\t: \t ";
+  cin>>train[p].to;
+  train[p].empty();
+  p++;
+}
+void a::allotment()
+{
+	static int x1 = 0;
+        int seat , f1 = 0 , f2 = 0 , f3 = 0;
+        string number;
+	bool x;
+        top:
+        cout<<"\nEnter train number \t: \t";
+        cin>>number;
+        int n;
+	for(n=0;n<=p;n++)
+  	{
+    		if(train[n].train_no.compare(number)==0)
+    			break;
+  	}
+	again:
+	if(n<=p) {
+		if(train[n].cvs == 0) {
+                        cout<<"All confirmed seats are booked.\n";
+			                  f1 = 1;
+		}
+    if(train[n].rac_vs == 0) {
+                        cout<<"All RAC seats are booked.\n";
+		                   	f2 = 1;
+		}
+
+	}
+	cout<<"\nAre you VIP or FOREIGNER then press 1 otherwise 0 :     ";
+	cin>>x;
+	while(n <= p && train[n].oqs > 0 && x == 1)
+	{
+		cout<<"\nEnter Seat Number \t:\t";
+                cin>>seat;
+                if(seat>(m1))
+                        cout<<"\nThere are only "<<m1 <<"other quota seats available in this train.";
+                else if(train[n].oqs > 0)
+                {
+                        if (train[n].other_seat[(seat-1)%m1].compare("Empty")==0)
+                        {
+                                cout<<"\nEnter passanger's name\t: \t";
+                                cin>>train[n].other_seat[(seat-1)%m1];
+                                train[n].oqs--;
+                                break;
+                        }
+                        else
+                                cout<<"This seat is already reserved.\n";
+                }
+	}
+        while(n<=p && f1 == 0 && x == 0)
+        {
+                cout<<"\nEnter Seat Number \t: \t";
+                cin>>seat;
+                if(seat>(n1))
+                        cout<<"\nThere are only "<<n1 <<"confirm seats available in this train.";
+                else if(train[n].cvs > 0)
+                {
+                        if (train[n].confirm_seat[(seat-1)%n1].compare("Empty")==0)
+                        {
+                                cout<<"\nEnter passanger's name \t: \t";
+                                cin>>train[n].confirm_seat[(seat-1)%n1];
+				                        train[n].cvs--;
+				                        f3 = 1;
+                                break;
+                        }
+                        else
+                                cout<<"\nThis seat is already reserved.\n";
+                }
+	}
+	if(f2 == 0 && f1 == 1 && n <= p &&  x == 0)
+	{
+		x1++;
+		string name2;
+		cout<<"\nEnter passenger's name \t: \t";
+		if(x1 == 1)
+        		cin>>train[n].name1;
+		else
+		{
+			cin>>name2;
+               		train[n].rac.push(make_pair(train[n].rac_vs ,make_pair( train[n].name1 , name2)));
+			train[n].name1 = "Empty";
+		}
+          	cout<<endl;
+		if(x1 == 2)
+	       	{
+               		train[n].rac_vs--;
+			x1 = 0;
+		}
+	}
+	if(n <= p && f1 == 1 && f2 == 1 &&  x == 0)
+	{
+		string name;
+		cout<<"\nEnter passenger's name \t: \t";
+		cin>>name;
+		train[n].wl.push(make_pair(train[n].wls , name));
+		cout<<endl;
+	        train[n].wls--;
+	}
+	bool a;
+	cout<<"\nDo you want book more seat in this train if yes then press 1 otherwise press 0\t: \t";
+	cin>>a;
+	if(a)
+		goto again;
+	if(n>p)
+        {
+		cout<<"\nEnter correct train no.\n";
+		goto top;
+        }
+}
+void a::empty()
+{
+  int x;
+  char e[6] ;
+  strcpy(e , "Empty");
+  for(x=0; x<n1;x++) {
+		train[p].confirm_seat[x] = e;
+ }
+ for(x=0; x<m1;x++) {
+                train[p].other_seat[x] = "Empty";
+ }
+ train[p].cvs = n1;
+ train[p].rac_vs = 1;
+ train[p].oqs = m1;
+ train[p].wls = 100;
+}
+void a::show()
+{
+        int n;
+        string number;
+        cout<<"\nEnter train no: ";
+        cin>>number;
+	cout<<endl;
+        for(n=0;n<=p;n++)
+        {
+                if(train[n].train_no.compare(number)==0)
+                        break;
+        }
+        while(n<=p)
+        {
+		            cout<<"confirm seats are :-"<<endl;
+                vline('*');
+                cout<<"Train no: \t"<<train[n].train_no
+                <<"\nPilot: \t"<<train[n].pilot<<"\t\tArrival time: \t"
+                <<train[n].arrival<<"\tDeparture time:"<<train[n].depart
+                <<"\nFrom: \t\t"<<train[n].from<<"\t\tTo: \t\t"<<
+                train[n].to<<"\n";
+                vline('*');
+                train[0].confirm_position(n);
+                int a=1;
+                for (int i=0; i<n1; i++)
+                {
+                                a++;
+                                if(train[n].confirm_seat[i].compare("Empty")!=0)
+                                        cout<<"\nThe seat no "<<(a-1)<<" is reserved for "<<train[n].confirm_seat[i]<<".";
+                }
+                break;
+        }
+	cout<<endl<<endl;
+	cout<<"other quota list are :\n";
+	train[0].other_position(n);
+        int a=1;
+        for (int i=0; i<m1; i++)
+         {
+                        a++;
+                        if(train[n].other_seat[i].compare("Empty")!=0)
+                                 cout<<"\nThe seat no "<<(a-1)<<" is reserved for "<<train[n].other_seat[i]<<".";
+         }
+	cout<<endl<<endl;
+	cout<<"RAC seats are :-\n";
+        if(!(train[n].rac.empty()) && n <= p)
+	{
+		priority_queue<pair<int , pair<string , string> > > pq = train[n].rac ;
+        	while(!(pq.empty()))
+		{
+               	        pair<int , pair<string , string> > p = pq.top();
+                       	cout<<p.first<<" "<<p.second.first<<"  "<<p.second.second;
+	                cout<<endl;
+                        pq.pop();
+        	}
+	}
+        cout<<endl<<endl;
+	cout<<"wating list are :-\n";
+	if(!(train[n].wl.empty()))
+	{
+		priority_queue<pair<int , string> > pq = train[n].wl ;
+		while(!(pq.empty()))
+		{
+			pair<int , string> p = pq.top();
+			cout<<pq.top().first<<" "<<pq.top().second;
+			cout<<endl;
+			pq.pop();
+		}
+	}
+	cout<<endl;
+	if(n>p)
+		cout<<"Enter correct train no: ";
+}
+void a::other_position(int l)
+{
+  int s=0;p=0;
+  for (int i =0; i<m1;i++)
+  {
+    cout<<"\n";
+    for (int j = 0;j<m2; j++)
+    {
+      s++;
+      if(train[l].other_seat[i].compare("Empty")==0)
+        {
+          cout.width(5);
+          cout.fill(' ');
+          cout<<s<<".";
+          cout.width(10);
+          cout.fill(' ');
+          cout<<train[l].other_seat[i];
+          p++;
+        }
+        else
+        {
+        cout.width(5);
+        cout.fill(' ');
+        cout<<s<<".";
+        cout.width(10);
+        cout.fill(' ');
+        cout<<train[l].other_seat[i];
+        }
+      }
+    }
+  cout<<"\n\nThere are "<<p<<" other seats empty in train No: "<<train[l].train_no;
+}
+void a::confirm_position(int l)
+{
+  int s=0;p=0;
+  for (int i =0; i<n1;i++)
+  {
+    cout<<"\n";
+    for (int j = 0;j<n2; j++)
+    {
+      s++;
+      if(train[l].confirm_seat[i].compare("Empty")==0)
+        {
+          cout.width(5);
+          cout.fill(' ');
+          cout<<s<<".";
+          cout.width(10);
+          cout.fill(' ');
+          cout<<train[l].confirm_seat[i];
+          p++;
+        }
+        else
+        {
+        cout.width(5);
+        cout.fill(' ');
+        cout<<s<<".";
+        cout.width(10);
+        cout.fill(' ');
+        cout<<train[l].confirm_seat[i];
+        }
+      }
+    }
+  cout<<"\n\nThere are "<<p<<" confirm seats empty in train No: "<<train[l].train_no;
+}
+void a ::cancel_ticket()
+{
+	int n;
+	bool x;
+	string number;
+	cout<<"\nEnter train number :";
+	cin>>number;
+	cout<<"\nAre you VIP or FOREIGNER then press 1 else 0 :";
+	cin>>x;
+	for(n=0;n<=p;n++)
+        {
+                if(train[n].train_no.compare(number)==0)
+                        break;
+        }
+	if(n <= p && x == 1)
+	{
+		int seat;
+                string name;
+                cout<<"\nEnter Seat Number: ";
+                cin>>seat;
+                cout<<"\n Enter passenger's name :";
+                cin>>name;
+		if(train[n].oqs >= 0)
+		{
+			if(train[n].other_seat[(seat-1)%m1].compare(name) == 0) {
+                		train[n].other_seat[(seat-1)%m1] = "Empty";
+                		train[n].oqs++;
+			}
+			else
+				cout<<"\nThis seat is not belongs to you";
+		}
+	}
+	if(n <= p && x == 0)
+	{
+		int seat;
+		string name;
+		cout<<"\nEnter Seat Number: ";
+                cin>>seat;
+		cout<<"\n Enter passenger's name :";
+		cin>>name;
+		if(train[n].cvs >= 0)
+                {
+                        if(train[n].confirm_seat[(seat-1)%n1].compare(name) == 0) {
+                                train[n].confirm_seat[(seat-1)%n1] = "Empty";
+                                train[n].cvs++;
+                        }
+                        else
+                                cout<<"\nThis seat is not belongs to you";
+		}
+	}
+}
+void a ::final_allotment()
+{
+	int n;
+	string number;
+	cout<<"\nEnter train number :";
+	cin>>number;
+	cout<<endl;
+	for(n=0;n<=p;n++)
+        {
+                if(train[n].train_no.compare(number)==0)
+                        break;
+        }
+	if(train[n].name1.compare("Empty") != 0)
+	{
+   		train[n].rac.push(make_pair(train[n].rac_vs ,make_pair( train[n].name1 , "Empty")));
+		train[n].rac_vs--;
+	}
+	int l = (10 - train[n].rac_vs) * 2;
+	priority_queue<pair<int , string> > pq;
+	while(!train[n].rac.empty())
+	{
+		pair<int , pair<string , string> > p1 = train[n].rac.top();
+		pq.push(make_pair(l , p1.second.first));
+		l--;
+		if(p1.second.second != "Empty")
+			pq.push(make_pair(l , p1.second.second));
+		l--;
+		train[n].rac.pop();
+	}
+	while(!pq.empty() && train[n].cvs >0)
+	{
+		for(int x=0; x<=n1;x++) {
+                		if(train[n].confirm_seat[x].compare("Empty")==0)
+				{
+					pair<int , string> p1 = pq.top();
+					train[n].confirm_seat[x] = p1.second;
+					pq.pop();
+					train[n].cvs--;
+				}
+		}
+	}
+	while(!pq.empty() && train[n].oqs > 0)
+        {
+                for(int x=0; x<m1;x++) {
+                                if(train[n].other_seat[x].compare("Empty")==0)
+                                {
+					pair<int ,string> p1 = pq.top();
+                                        train[n].other_seat[x] = p1.second;
+                                        pq.pop();
+                                        train[n].oqs--;
+                                }
+
+		}
+        }
+	train[n].rac_vs = 1;
+	l = pq.size() - train[n].rac_vs;
+	if(l < 0) l=0;
+	while(!pq.empty() && train[n].rac_vs > 0)
+	{
+		if((train[n].rac_vs ) == l)
+		{
+			string name = pq.top().second;
+			pq.pop();
+                        train[n].rac.push(make_pair(train[n].rac_vs , make_pair(name , pq.top().second)));
+			l--;
+		}
+		else
+			train[n].rac.push(make_pair(train[n].rac_vs , make_pair(pq.top().second , "Empty")));
+		train[n].rac_vs--;
+		pq.pop();
+	}
+	priority_queue<pair<int , string > > q = train[n].wl;
+	while(!train[n].wl.empty())
+	{
+		train[n].wl.pop();
+	}
+	while(!q.empty() && train[n].cvs >0)
+        {
+                for(int x=0; x<n1;x++) {
+                                if(train[n].confirm_seat[x].compare("Empty") == 0)
+                                {
+                                        pair<int , string> p1 = q.top();
+                                        train[n].confirm_seat[x] = p1.second;
+					q.pop();
+                                        train[n].cvs--;
+                                }
+                }
+        }
+/*	while(!q.empty() && train[n].oqs > 0)
+        {
+                for(int x=0; x<m1;x++) {
+                                if(train[n].other_seat[x].compare("Empty") == 0)
+                                {
+                                        pair<int ,string> p1 = q.top();
+                                        train[n].other_seat[x] = p1.second;
+                                        q.pop();
+                                        train[n].oqs--;
+                                }
+                }
+        }*/
+/*	while(train[n].rac_vs > 0 && !q.empty())
+	{
+                pair<int ,string> p1 = q.top();
+		q.pop();
+		if(!q.empty()) {
+                	pair<int ,string> p2 = q.top();
+			q.pop();
+                	train[n].rac.push(make_pair(train[n].rac_vs ,make_pair(p1.second  , p2.second)));
+		}
+		else
+                	train[n].rac.push(make_pair(train[n].rac_vs ,make_pair(p1.second  , "Empty")));
+		train[n].rac_vs--;
+	}*/
+	train[n].wl = q;
+}
+int main()
+{
+        int w;
+        while(1)
+        {
+                cout<<"\n";
+
+		cout<<"\t\t\t1.Install\n\t\t\t"
+                <<"2.Reservation\n\t\t\t"
+                <<"3.Show\n\t\t\t"
+                <<"4.Available Train\n\t\t\t"
+		<<"5.Cancel ticket\n\t\t\t"
+		<<"6.final allotment\n\t\t\t"
+                <<"7.Exit";
+                cout<<"\n\t\t\tEnter your choice:-> ";
+                cin>>w;
+                switch(w)
+                {
+                        case 1:  train[p].install();
+                        	 break;
+                        case 2:  train[p].allotment();
+                        	 break;
+                        case 3:  train[0].show();
+                        	 break;
+			case 5:  train[0].cancel_ticket();
+				 break;
+			case 6:  train[0].final_allotment();
+				 break;
+                       case 7:  exit(0);
+                }
+        }
+        return 0;
+}
