@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+//User function template for C++
+class Solution{
+public:
+	int search(string pat, string txt) {
+	    // code here
+	    vector<int>v(26,0),v1(26,0);
+	    int cnt=0;
+	    int n=pat.size();
+	    int m=txt.size();
+	    for(int i=0;i<n;i++)
+	    {
+	        v[pat[i]-'a']++;
+	        v1[txt[i]-'a']++;
+	    }
+	    if(v==v1)
+	    cnt++;
+	    for(int i=n;i<m;i++)
+	    {
+	        v1[txt[i-n]-'a']--;
+	        v1[txt[i]-'a']++;
+	        if(v==v1)
+	        cnt++;
+	    }
+	    return cnt;
+	}
+
+};
+
+int main() {
+    int t;
+    cin >> t;
+    while (t--) {
+        string pat, txt;
+        cin >> txt >> pat;
+        Solution ob;
+        auto ans = ob.search(pat, txt);
+        cout << ans << "\n";
+    }
+    return 0;
+}  
